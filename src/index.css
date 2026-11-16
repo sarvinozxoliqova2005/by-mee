@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.font-handwriting {
+  font-family: 'Caveat', cursive;
+}
+
+.font-price {
+  font-family: 'Nunito', sans-serif;
+}
+
+.section-title {
+  font-family: 'Bahnschrift', sans-serif;
+  font-weight: 400;
+  font-size: 35px;
+  line-height: 100%;
+  text-transform: uppercase;
+}
