@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ChevronDown, ShoppingCart, Sun, Check, Menu, X } from 'lucide-react';
+import { MapPin, ChevronDown, ShoppingCart, Sun, Menu, X } from 'lucide-react';
 
 const categories = [
   { name: 'СОКИ', path: '/soki' },
@@ -21,170 +21,205 @@ const infoLinks = [
 ];
 
 const regions = [
-  'Москва',
-  'Санкт-Петербург',
-  'Ташкент',
-  'Алматы',
-  'Казань',
+  'Волгоград',
+  'Воронеж',
   'Екатеринбург',
-  'Краснодар',
-  'Сочи',
+  'Казань',
+  'Красноярск',
+  'Москва',
+  'Нижний Новгород',
+  'Новосибирск',
+  'Пенза',
+  'Самара',
+  'Санкт-Петербург',
+  'Уфа',
 ];
 
 export default function Header() {
   const [selectedRegion, setSelectedRegion] = useState('ВАШ РЕГИОН');
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const [activeMobileMenu, setActiveMobileMenu] = useState(null); 
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [activeMobileMenu, setActiveMobileMenu] = useState(null);
 
-  const handleSelect = (region) => {
-    setSelectedRegion(region);
-    setIsOpen(false);
+  // Smart Scroll holatlari
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Kirish formasi holati
+  const [userName, setUserName] = useState('');
+  const [userPhone, setUserPhone] = useState('');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Soya qo'shish uchun
+      setIsScrolled(currentScrollY > 20);
+
+      // Modal oyna ochiq bo'lsa header joyida tursin
+      if (isRegionModalOpen || isLoginModalOpen) {
+        setIsHeaderVisible(true);
+        setLastScrollY(currentScrollY);
+        return;
+      }
+
+      if (currentScrollY <= 80) {
+        // Eng tepada har doim ko'rinib turadi
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Pastga skroll qilinganda silliq yashirinadi
+        setIsHeaderVisible(false);
+        setActiveMobileMenu(null);
+      } else if (currentScrollY < lastScrollY) {
+        // Tepaga skroll qilinganda silliq chiqib keladi
+        setIsHeaderVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen]);
+
+  const handleSelectRegion = (region) => {
+    setSelectedRegion(region.toUpperCase());
+    setIsRegionModalOpen(false);
   };
 
   const toggleMobileMenu = (menuType) => {
     setActiveMobileMenu((prev) => (prev === menuType ? null : menuType));
   };
 
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    if (!userName.trim() || !userPhone.trim()) return;
+    setIsLoginModalOpen(false);
+    setUserName('');
+    setUserPhone('');
+  };
+
   return (
-    <header className="w-full bg-white text-[#1E1E1E] relative select-none">
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 pt-3 md:pt-4 pb-3 flex items-center lg:items-start justify-between gap-3 sm:gap-6">
-        
-        <div className="relative z-20 shrink-0 lg:-mb-10 flex items-center">
-          <Link
-            to="/"
-            className="hidden lg:flex w-28 h-28 rounded-full bg-white border-2 border-[#1E1E1E] flex-col items-center justify-center p-2 shadow-sm hover:scale-105 transition-transform"
-          >
-            <span className="text-[9px] font-medium tracking-tight text-gray-700 -mb-1">
-              since 2007
-            </span>
-            <div className="text-center leading-none font-black tracking-tighter text-2xl">
-              <span className="block">vita</span>
-              <span className="block">Juice</span>
-            </div>
-          </Link>
-
-          <div className="lg:hidden flex items-center gap-3">
-            <button
-              onClick={() => toggleMobileMenu('burger')}
-              className="p-1 cursor-pointer hover:opacity-75 transition-opacity"
-              aria-label="Навигация"
-            >
-              {activeMobileMenu === 'burger' ? (
-                <X className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
-              ) : (
-                <Menu className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
-              )}
-            </button>
-
-            <button
-              onClick={() => toggleMobileMenu('catalog')}
-              className={`font-['Bahnschrift'] font-bold text-xl tracking-wide cursor-pointer py-1 transition-colors ${
-                activeMobileMenu === 'catalog' ? 'text-orange-600' : 'text-[#1E1E1E]'
-              }`}
-            >
-              МЕНЮ
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-1 min-w-0 flex flex-col justify-between gap-2.5 md:gap-4">
+    <>
+      <header
+        className={`sticky top-0 w-full bg-white text-[#1E1E1E] select-none z-40 transition-all duration-300 ease-in-out ${
+          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+        } ${isScrolled ? 'shadow-md' : ''}`}
+      >
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 pt-3 md:pt-4 pb-3 flex items-center lg:items-start justify-between gap-3 sm:gap-6">
           
-          <div className="flex items-center justify-between text-xs md:text-sm font-semibold tracking-wide relative gap-2">
-            
-            <div className="relative min-w-0">
-              <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1 sm:gap-1.5 hover:opacity-75 transition-opacity cursor-pointer bg-gray-50 px-2 sm:px-2.5 py-1.5 rounded-lg border border-gray-200"
+          <div className="relative z-20 shrink-0 lg:-mb-10 flex items-center">
+            <Link
+              to="/"
+              className="hidden lg:flex w-28 h-28 rounded-full bg-white border-2 border-[#1E1E1E] flex-col items-center justify-center p-2 shadow-sm hover:scale-105 transition-transform"
+            >
+              <span className="text-[9px] font-medium tracking-tight text-gray-700 -mb-1">
+                since 2007
+              </span>
+              <div className="text-center leading-none font-black tracking-tighter text-2xl">
+                <span className="block">vita</span>
+                <span className="block">Juice</span>
+              </div>
+            </Link>
+
+            <div className="lg:hidden flex items-center gap-3">
+              <button
+                onClick={() => toggleMobileMenu('burger')}
+                className="p-1 cursor-pointer hover:opacity-75 transition-opacity"
+                aria-label="Навигация"
               >
-                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2] text-orange-600 shrink-0" />
-                <span className="max-w-[95px] sm:max-w-[150px] truncate text-[11px] sm:text-xs md:text-sm">
-                  {selectedRegion}
-                </span>
-                <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2] shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                {activeMobileMenu === 'burger' ? (
+                  <X className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
+                ) : (
+                  <Menu className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
+                )}
               </button>
 
-              {isOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-30" 
-                    onClick={() => setIsOpen(false)} 
-                  />
-                  
-                  <div className="absolute top-full left-0 mt-2 w-52 sm:w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-40 py-2 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 mb-1">
-                      Выберите город
-                    </div>
-                    <div className="max-h-60 overflow-y-auto">
-                      {regions.map((region) => (
-                        <button
-                          key={region}
-                          onClick={() => handleSelect(region)}
-                          className={`w-full text-left px-3.5 py-2 text-xs md:text-sm flex items-center justify-between hover:bg-orange-50 hover:text-orange-600 transition-colors ${
-                            selectedRegion === region ? 'font-bold text-orange-600 bg-orange-50/50' : 'text-gray-700'
-                          }`}
-                        >
-                          <span>{region}</span>
-                          {selectedRegion === region && <Check className="w-4 h-4 text-orange-600" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
-              <Link
-                to="/cart"
-                className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity"
+              <button
+                onClick={() => toggleMobileMenu('catalog')}
+                className={`font-['Bahnschrift'] font-bold text-xl tracking-wide cursor-pointer py-1 transition-colors ${
+                  activeMobileMenu === 'catalog' ? 'text-orange-600' : 'text-[#1E1E1E]'
+                }`}
               >
-                <span className="hidden sm:inline">КОРЗИНА (0)</span>
-                <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
-              </Link>
-
-              <Link
-                to="/login"
-                className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity"
-              >
-                <span className="hidden sm:inline">ВОЙТИ</span>
-                <Sun className="w-5 h-5 stroke-[1.8]" />
-              </Link>
+                МЕНЮ
+              </button>
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center justify-between gap-y-3 pt-1">
-            <nav className="flex items-center gap-5 md:gap-7 overflow-x-auto no-scrollbar pb-1">
-              {categories.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="group shrink-0 flex flex-col items-center gap-1.5 text-xs md:text-[13px] font-bold tracking-wide hover:text-orange-600 transition-colors"
+          <div className="flex-1 min-w-0 flex flex-col justify-between gap-2.5 md:gap-4">
+            
+            <div className="flex items-center justify-between text-xs md:text-sm font-semibold tracking-wide relative gap-2">
+              
+              <div className="relative min-w-0">
+                <button 
+                  onClick={() => setIsRegionModalOpen(true)}
+                  className="flex items-center gap-1 sm:gap-1.5 hover:opacity-75 transition-opacity cursor-pointer py-1"
                 >
-                  <span className="whitespace-nowrap">{item.name}</span>
-                  <span className="w-3.5 h-3.5 rounded-full bg-[#D9D9D9] group-hover:bg-orange-500 transition-colors" />
-                </Link>
-              ))}
-            </nav>
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.8] text-[#1E1E1E] shrink-0" />
+                  <span className="max-w-[110px] sm:max-w-[180px] truncate text-xs md:text-sm uppercase">
+                    {selectedRegion}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 stroke-[1.8] shrink-0 transition-transform duration-300 ${isRegionModalOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
 
-            <nav className="flex items-center gap-6 text-xs md:text-[13px] font-bold tracking-wide pb-5 shrink-0">
-              {infoLinks.map((link) => (
+              <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
                 <Link
-                  key={link.name}
-                  to={link.path}
-                  className="hover:text-orange-600 transition-colors"
+                  to="/cart"
+                  className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity"
                 >
-                  {link.name}
+                  <span className="hidden sm:inline">КОРЗИНА (0)</span>
+                  <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
                 </Link>
-              ))}
-            </nav>
+
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer uppercase"
+                >
+                  <span className="hidden sm:inline">ВОЙТИ</span>
+                  <Sun className="w-5 h-5 stroke-[1.8]" />
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden lg:flex items-center justify-between gap-y-3 pt-1">
+              <nav className="flex items-center gap-5 md:gap-7 overflow-x-auto no-scrollbar pb-1">
+                {categories.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className="group shrink-0 flex flex-col items-center gap-1.5 text-xs md:text-[13px] font-bold tracking-wide hover:text-orange-600 transition-colors"
+                  >
+                    <span className="whitespace-nowrap">{item.name}</span>
+                    <span className="w-3.5 h-3.5 rounded-full bg-[#D9D9D9] group-hover:bg-orange-500 transition-colors" />
+                  </Link>
+                ))}
+              </nav>
+
+              <nav className="flex items-center gap-6 text-xs md:text-[13px] font-bold tracking-wide pb-5 shrink-0">
+                {infoLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className="hover:text-orange-600 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
           </div>
-
         </div>
-      </div>
 
-      {activeMobileMenu === 'burger' && (
-        <div className="lg:hidden bg-white border-t border-gray-100 px-4 py-5 shadow-xl animate-in slide-in-from-top-2 duration-150">
+        <div
+          className={`lg:hidden overflow-hidden bg-white transition-all duration-300 ease-in-out ${
+            activeMobileMenu === 'burger'
+              ? 'max-h-72 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100'
+              : 'max-h-0 py-0 px-4 opacity-0'
+          }`}
+        >
           <div className="flex flex-col gap-2.5">
             {infoLinks.map((link) => (
               <Link
@@ -198,10 +233,15 @@ export default function Header() {
             ))}
           </div>
         </div>
-      )}
 
-      {activeMobileMenu === 'catalog' && (
-        <div className="lg:hidden bg-white border-t border-gray-100 px-4 py-5 shadow-xl animate-in slide-in-from-top-2 duration-150">
+        {/* Mobil Katalog Menyu */}
+        <div
+          className={`lg:hidden overflow-hidden bg-white transition-all duration-300 ease-in-out ${
+            activeMobileMenu === 'catalog'
+              ? 'max-h-96 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100'
+              : 'max-h-0 py-0 px-4 opacity-0'
+          }`}
+        >
           <div className="grid grid-cols-2 gap-2.5">
             {categories.map((item) => (
               <Link
@@ -216,9 +256,159 @@ export default function Header() {
             ))}
           </div>
         </div>
-      )}
 
-      <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
-    </header>
+        <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
+      </header>
+
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
+          isRegionModalOpen
+            ? 'opacity-100 pointer-events-auto visible'
+            : 'opacity-0 pointer-events-none invisible'
+        }`}
+        onClick={() => setIsRegionModalOpen(false)}
+      >
+        <div
+          className={`w-full max-w-[600px] bg-white rounded-[28px] overflow-hidden shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
+            isRegionModalOpen
+              ? 'scale-100 translate-y-0 opacity-100'
+              : 'scale-95 translate-y-4 opacity-0'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="bg-[#FFD600] px-6 sm:px-8 py-4 sm:py-5 flex items-center justify-between">
+            <h3 className="font-['Bahnschrift'] font-normal text-xl sm:text-2xl uppercase tracking-wide">
+              ВАШ РЕГИОН
+            </h3>
+            <button
+              onClick={() => setIsRegionModalOpen(false)}
+              aria-label="Закрыть"
+              className="p-1 hover:rotate-90 hover:scale-110 transition-all duration-300 cursor-pointer"
+            >
+              <X className="w-6 h-6 stroke-[2]" />
+            </button>
+          </div>
+
+          <div className="px-6 sm:px-8 py-6 sm:py-7">
+            <p className="font-['Bahnschrift'] text-lg sm:text-xl uppercase tracking-wide mb-3">
+              ВАШ ГОРОД КРАСНОЯРСК?
+            </p>
+
+            <button
+              onClick={() => handleSelectRegion('Красноярск')}
+              className="bg-[#FFD600] hover:bg-[#f5cc00] text-[#1E1E1E] font-['Bahnschrift'] font-bold text-sm sm:text-base px-8 py-1.5 rounded-full uppercase tracking-wider transition-colors cursor-pointer mb-6"
+            >
+              ДА
+            </button>
+
+            <p className="font-['Bahnschrift'] text-base sm:text-lg uppercase tracking-wide mb-4">
+              НЕТ ВЫБРАТЬ ИЗ СПИСКА
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2.5 text-sm sm:text-base font-medium">
+              {regions.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => handleSelectRegion(city)}
+                  className={`text-left hover:text-[#779A4B] transition-colors cursor-pointer ${
+                    selectedRegion === city.toUpperCase()
+                      ? 'font-bold text-[#779A4B]'
+                      : 'text-[#1E1E1E]'
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
+          isLoginModalOpen
+            ? 'opacity-100 pointer-events-auto visible'
+            : 'opacity-0 pointer-events-none invisible'
+        }`}
+        onClick={() => setIsLoginModalOpen(false)}
+      >
+        <div
+          className={`w-full max-w-[540px] bg-white rounded-[28px] overflow-hidden shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
+            isLoginModalOpen
+              ? 'scale-100 translate-y-0 opacity-100'
+              : 'scale-95 translate-y-4 opacity-0'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="bg-[#FFD600] px-6 sm:px-9 py-4 sm:py-5 flex items-center justify-between">
+            <h3 className="font-['Bahnschrift'] font-normal text-xl sm:text-2xl uppercase tracking-wide">
+              ВХОД НА САЙТ
+            </h3>
+            <button
+              onClick={() => setIsLoginModalOpen(false)}
+              aria-label="Закрыть"
+              className="p-1 hover:rotate-90 hover:scale-110 transition-all duration-300 cursor-pointer"
+            >
+              <X className="w-6 h-6 stroke-[2]" />
+            </button>
+          </div>
+
+          <form onSubmit={handleLoginSubmit} className="px-6 sm:px-9 py-7 sm:py-8 flex flex-col gap-5 sm:gap-6">
+            
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
+              <label className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
+                Имя
+              </label>
+              <input
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                className="w-full bg-transparent border-b-[4px] border-dashed border-[#1E1E1E] focus:outline-none focus:border-[#779A4B] py-1 text-base sm:text-lg font-medium transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
+              <label className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
+                Телефон
+              </label>
+              <input
+                type="tel"
+                value={userPhone}
+                onChange={(e) => setUserPhone(e.target.value)}
+                required
+                className="w-full bg-transparent border-b-[4px] border-dashed border-[#1E1E1E] focus:outline-none focus:border-[#779A4B] py-1 text-base sm:text-lg font-medium transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-6 mt-1">
+              <span className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
+                Выслать код
+              </span>
+
+              <div className="w-full flex flex-col items-start gap-4">
+                <p className="text-[10px] sm:text-[11px] text-[#1E1E1E]/85 leading-snug">
+                  Продолжая Вы соглашаетесь с пользовательским соглашением и политикой обработки персональных данных
+                </p>
+
+                <button
+                  type="submit"
+                  aria-label="Отправить код"
+                  className="bg-[#FFD600] hover:bg-[#f5cc00] text-[#1E1E1E] w-24 h-8 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-all cursor-pointer"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-3.5 h-3.5 fill-current ml-0.5"
+                  >
+                    <path d="M5 3l14 9-14 9V3z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </>
   );
 }
