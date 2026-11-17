@@ -76,15 +76,14 @@ export default function Bestsellers() {
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [favorites, setFavorites] = useState({});
 
-  // Ekran o'lchamiga qarab nechta mahsulot ko'rinishini aniqlash
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setItemsPerPage(1); // Telefonlarda 1 ta
+        setItemsPerPage(1); 
       } else if (window.innerWidth < 1024) {
-        setItemsPerPage(2); // Planshetlarda 2 ta
+        setItemsPerPage(2); 
       } else {
-        setItemsPerPage(3); // Kompyuterda 3 ta
+        setItemsPerPage(3); 
       }
     };
 
