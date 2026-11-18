@@ -192,11 +192,13 @@ export default function Header({ cartItems = [], setCartItems }) {
                     onClick={() => setIsCartOpen(!isCartOpen)}
                     className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer relative"
                   >
-                    <span>
+                    {/* Noutbukda yozuv va son chiqadi, mobil versiyada yozuvi yashirinadi */}
+                    <span className="hidden sm:inline">
                       КОРЗИНА ({totalQuantity})
                     </span>
                     <div className="relative">
                       <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                      {/* Mobil versiyada ikonka ustida badge (soni) ko'rinib turadi */}
                       {totalQuantity > 0 && (
                         <span className="absolute -top-1.5 -right-2 bg-orange-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center sm:hidden">
                           {totalQuantity}
@@ -430,6 +432,7 @@ export default function Header({ cartItems = [], setCartItems }) {
         <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
       </header>
 
+      {/* REGION MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isRegionModalOpen
@@ -494,6 +497,7 @@ export default function Header({ cartItems = [], setCartItems }) {
         </div>
       </div>
 
+      {/* LOGIN MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isLoginModalOpen
