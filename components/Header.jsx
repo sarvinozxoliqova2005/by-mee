@@ -69,6 +69,8 @@ export default function Header({ cartItems = [], setCartItems }) {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -185,16 +187,22 @@ export default function Header({ cartItems = [], setCartItems }) {
               </div>
 
               <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
-                {/* RESPONSIVE KORZINA VA DROPDOWN */}
                 <div className="relative">
                   <button
                     onClick={() => setIsCartOpen(!isCartOpen)}
-                    className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer"
+                    className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer relative"
                   >
-                    <span className="hidden sm:inline">
-                      КОРЗИНА ({cartItems.reduce((sum, item) => sum + item.quantity, 0)})
+                    <span>
+                      КОРЗИНА ({totalQuantity})
                     </span>
-                    <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                    <div className="relative">
+                      <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                      {totalQuantity > 0 && (
+                        <span className="absolute -top-1.5 -right-2 bg-orange-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center sm:hidden">
+                          {totalQuantity}
+                        </span>
+                      )}
+                    </div>
                   </button>
 
                   {isCartOpen && (
@@ -204,7 +212,6 @@ export default function Header({ cartItems = [], setCartItems }) {
                         style={{ backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
                         onClick={() => setIsCartOpen(false)}
                       />
-                      {/* Mobil qurilmalarda ekranni to'ldirib, planshet/kompyuterda o'ng tomonga joylashadigan responsive dizayn */}
                       <div className="absolute right-[-30px] sm:right-0 top-full mt-3 w-[calc(100vw-32px)] sm:w-[380px] max-w-[380px] bg-white rounded-[24px] shadow-2xl border border-gray-100 z-50 overflow-hidden select-none animate-in fade-in zoom-in-95 duration-200">
                         <div className="max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 flex flex-col divide-y divide-gray-100">
                           {cartItems.length === 0 ? (
@@ -423,7 +430,6 @@ export default function Header({ cartItems = [], setCartItems }) {
         <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
       </header>
 
-      {/* RESPONSIVE REGION MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isRegionModalOpen
@@ -488,7 +494,6 @@ export default function Header({ cartItems = [], setCartItems }) {
         </div>
       </div>
 
-      {/* RESPONSIVE LOGIN MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isLoginModalOpen
