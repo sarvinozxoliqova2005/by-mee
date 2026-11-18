@@ -173,7 +173,7 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
 
   return (
     <main className="w-full bg-white text-[#1E1E1E] select-none pb-20">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 pt-6">
+      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 md:px-8 pt-6">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-black mb-6 cursor-pointer transition-colors"
@@ -237,8 +237,8 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
               <p className="text-gray-500 mt-0.5">{product.storage}</p>
             </div>
 
-            <div className="pt-4 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center justify-between md:justify-start gap-4 w-full md:w-auto">
+            <div className="pt-4 border-t border-gray-100 flex flex-col items-center gap-4">
+              <div className="flex items-center justify-center gap-4 w-full">
                 <span className="font-['Bahnschrift'] font-bold text-2xl sm:text-3xl text-[#1E1E1E]">
                   {displayPrice}₽
                 </span>
@@ -258,7 +258,7 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
               </div>
 
               {quantity > 0 ? (
-                <div className="flex items-center justify-center bg-gray-100 rounded-full px-5 py-2.5 gap-6 max-w-[200px] md:w-auto">
+                <div className="flex items-center justify-center bg-gray-100 rounded-full px-5 py-2.5 gap-6 w-full max-w-[220px]">
                   <button
                     type="button"
                     onClick={() => updateQuantity(product.id, -1)}
@@ -285,7 +285,7 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
                       onAddToCart(product);
                     }
                   }}
-                  className="bg-[#FFD600] hover:bg-[#f5cc00] active:scale-95 text-[#1E1E1E] font-['Bahnschrift'] font-bold text-xs sm:text-sm w-full max-w-[180px] py-2.5 rounded-full uppercase tracking-wider shadow-sm transition-all cursor-pointer text-center"
+                  className="bg-[#FFD600] hover:bg-[#f5cc00] active:scale-95 text-[#1E1E1E] font-['Bahnschrift'] font-bold text-xs sm:text-sm w-full max-w-[220px] py-2.5 rounded-full uppercase tracking-wider shadow-sm transition-all cursor-pointer text-center"
                 >
                   В КОРЗИНУ
                 </button>

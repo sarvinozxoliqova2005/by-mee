@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductPage from "../components/ProductPage";
 import Bestsellers from "../components/Bestsellers";
@@ -37,6 +37,7 @@ const slides = [
 
 export default function HeroSlider({ cartItems, setCartItems, onAddToCart }) {
   const [current, setCurrent] = useState(0);
+  
 
   const prevSlide = () => {
     setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
@@ -146,9 +147,8 @@ export default function HeroSlider({ cartItems, setCartItems, onAddToCart }) {
       </section>
 
       <div>
-      {/* Bestsellers componentiga cartItems va setCartItems berildi */}
-      <Bestsellers cartItems={cartItems} setCartItems={setCartItems} />
-    </div>
+        <Bestsellers cartItems={cartItems} setCartItems={setCartItems} />
+      </div>
 
       <section>
         <DeliveryAndPayment />
@@ -157,6 +157,8 @@ export default function HeroSlider({ cartItems, setCartItems, onAddToCart }) {
       <section>
         <LoyaltySystem />
       </section>
+
+      
     </main>
   );
 }

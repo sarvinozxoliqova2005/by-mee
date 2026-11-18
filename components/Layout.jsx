@@ -1,18 +1,17 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "../components/Header";
 
 export default function Layout({ cartItems, setCartItems, onAddToCart }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Header doimiy joyida turadi */}
       <Header cartItems={cartItems} setCartItems={setCartItems} />
-      
-      <main className="flex-1">
-        <Outlet context={{ onAddToCart, cartItems, setCartItems }} />
-      </main>
 
-      <Footer />
+      {/* Sahifalar ochilishi uchun Outlet */}
+      <main className="flex-1">
+        <Outlet context={{ cartItems, setCartItems, onAddToCart }} />
+      </main>
     </div>
   );
 }
