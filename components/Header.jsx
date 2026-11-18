@@ -1,87 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { MapPin, ChevronDown, ShoppingCart, Sun, Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { MapPin, ChevronDown, ShoppingCart, Sun, Menu, X, Trash2, Plus, Minus } from "lucide-react";
 
 const categories = [
-  { name: 'СОКИ', path: '/soki' },
-  { name: 'МИКСЫ', path: '/miksy' },
-  { name: 'СМУЗИ', path: '/smuzi' },
-  { name: 'ЛАССИ', path: '/lassi' },
-  { name: 'ДЕТОКС', path: '/detoks' },
-  { name: 'БОУЛЫ', path: '/bouly' },
-  { name: 'САЛАТЫ', path: '/salaty' },
-  { name: 'ЗДОРОВАЯ ЕДА', path: '/zdorovaya-eda' },
+  { name: "СОКИ", path: "/soki" },
+  { name: "МИКСЫ", path: "/miksy" },
+  { name: "СМУЗИ", path: "/smuzi" },
+  { name: "ЛАССИ", path: "/lassi" },
+  { name: "ДЕТОКС", path: "/detoks" },
+  { name: "БОУЛЫ", path: "/bouly" },
+  { name: "САЛАТЫ", path: "/salaty" },
+  { name: "ЗДОРОВАЯ ЕДА", path: "/zdorovaya-eda" },
 ];
 
 const infoLinks = [
-  { name: 'О НАС', path: '/about' },
-  { name: 'ФРАНШИЗА', path: '/franchise' },
-  { name: 'КОНТАКТЫ', path: '/contacts' },
-  { name: 'РАБОТА', path: '/jobs' },
+  { name: "О НАС", path: "/about" },
+  { name: "ФРАНШИЗА", path: "/franchise" },
+  { name: "КОНТАКТЫ", path: "/contacts" },
+  { name: "РАБОТА", path: "/jobs" },
 ];
 
 const regions = [
-  'Волгоград',
-  'Воронеж',
-  'Екатеринбург',
-  'Казань',
-  'Красноярск',
-  'Москва',
-  'Нижний Новгород',
-  'Новосибирск',
-  'Пенза',
-  'Самара',
-  'Санкт-Петербург',
-  'Уфа',
+  "Волгоград",
+  "Воронеж",
+  "Екатеринбург",
+  "Казань",
+  "Красноярск",
+  "Москва",
+  "Нижний Новгород",
+  "Новосибирск",
+  "Пенза",
+  "Самара",
+  "Санкт-Петербург",
+  "Уфа",
 ];
 
-export default function Header() {
-  const [selectedRegion, setSelectedRegion] = useState('ВАШ РЕГИОН');
+export default function Header({ cartItems = [], setCartItems }) {
+  const [selectedRegion, setSelectedRegion] = useState("ВАШ РЕГИОН");
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeMobileMenu, setActiveMobileMenu] = useState(null);
 
-  // Smart Scroll holatlari
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // Kirish formasi holati
-  const [userName, setUserName] = useState('');
-  const [userPhone, setUserPhone] = useState('');
+  const [userName, setUserName] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+
+  const updateQuantity = (id, delta) => {
+    if (!setCartItems) return;
+    setCartItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.id === id) {
+            const newQty = item.quantity + delta;
+            return newQty > 0 ? { ...item, quantity: newQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean)
+    );
+  };
+
+  const removeItem = (id) => {
+    if (!setCartItems) return;
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Soya qo'shish uchun
       setIsScrolled(currentScrollY > 20);
 
-      // Modal oyna ochiq bo'lsa header joyida tursin
-      if (isRegionModalOpen || isLoginModalOpen) {
+      if (isRegionModalOpen || isLoginModalOpen || isCartOpen) {
         setIsHeaderVisible(true);
         setLastScrollY(currentScrollY);
         return;
       }
 
       if (currentScrollY <= 80) {
-        // Eng tepada har doim ko'rinib turadi
         setIsHeaderVisible(true);
       } else if (currentScrollY > lastScrollY) {
-        // Pastga skroll qilinganda silliq yashirinadi
         setIsHeaderVisible(false);
         setActiveMobileMenu(null);
       } else if (currentScrollY < lastScrollY) {
-        // Tepaga skroll qilinganda silliq chiqib keladi
         setIsHeaderVisible(true);
       }
 
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen, isCartOpen]);
 
   const handleSelectRegion = (region) => {
     setSelectedRegion(region.toUpperCase());
@@ -96,19 +115,18 @@ export default function Header() {
     e.preventDefault();
     if (!userName.trim() || !userPhone.trim()) return;
     setIsLoginModalOpen(false);
-    setUserName('');
-    setUserPhone('');
+    setUserName("");
+    setUserPhone("");
   };
 
   return (
     <>
       <header
         className={`sticky top-0 w-full bg-white text-[#1E1E1E] select-none z-40 transition-all duration-300 ease-in-out ${
-          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        } ${isScrolled ? 'shadow-md' : ''}`}
+          isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+        } ${isScrolled ? "shadow-md" : ""}`}
       >
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 pt-3 md:pt-4 pb-3 flex items-center lg:items-start justify-between gap-3 sm:gap-6">
-          
           <div className="relative z-20 shrink-0 lg:-mb-10 flex items-center">
             <Link
               to="/"
@@ -125,11 +143,11 @@ export default function Header() {
 
             <div className="lg:hidden flex items-center gap-3">
               <button
-                onClick={() => toggleMobileMenu('burger')}
+                onClick={() => toggleMobileMenu("burger")}
                 className="p-1 cursor-pointer hover:opacity-75 transition-opacity"
                 aria-label="Навигация"
               >
-                {activeMobileMenu === 'burger' ? (
+                {activeMobileMenu === "burger" ? (
                   <X className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
                 ) : (
                   <Menu className="w-7 h-7 stroke-[2.2] text-[#1E1E1E]" />
@@ -137,9 +155,11 @@ export default function Header() {
               </button>
 
               <button
-                onClick={() => toggleMobileMenu('catalog')}
+                onClick={() => toggleMobileMenu("catalog")}
                 className={`font-['Bahnschrift'] font-bold text-xl tracking-wide cursor-pointer py-1 transition-colors ${
-                  activeMobileMenu === 'catalog' ? 'text-orange-600' : 'text-[#1E1E1E]'
+                  activeMobileMenu === "catalog"
+                    ? "text-orange-600"
+                    : "text-[#1E1E1E]"
                 }`}
               >
                 МЕНЮ
@@ -148,11 +168,9 @@ export default function Header() {
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col justify-between gap-2.5 md:gap-4">
-            
             <div className="flex items-center justify-between text-xs md:text-sm font-semibold tracking-wide relative gap-2">
-              
               <div className="relative min-w-0">
-                <button 
+                <button
                   onClick={() => setIsRegionModalOpen(true)}
                   className="flex items-center gap-1 sm:gap-1.5 hover:opacity-75 transition-opacity cursor-pointer py-1"
                 >
@@ -160,18 +178,123 @@ export default function Header() {
                   <span className="max-w-[110px] sm:max-w-[180px] truncate text-xs md:text-sm uppercase">
                     {selectedRegion}
                   </span>
-                  <ChevronDown className={`w-4 h-4 stroke-[1.8] shrink-0 transition-transform duration-300 ${isRegionModalOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 stroke-[1.8] shrink-0 transition-transform duration-300 ${isRegionModalOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
               </div>
 
               <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
-                <Link
-                  to="/cart"
-                  className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity"
-                >
-                  <span className="hidden sm:inline">КОРЗИНА (0)</span>
-                  <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
-                </Link>
+                {/* RESPONSIVE KORZINA VA DROPDOWN */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsCartOpen(!isCartOpen)}
+                    className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer"
+                  >
+                    <span className="hidden sm:inline">
+                      КОРЗИНА ({cartItems.reduce((sum, item) => sum + item.quantity, 0)})
+                    </span>
+                    <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                  </button>
+
+                  {isCartOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40 bg-black/30"
+                        style={{ backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
+                        onClick={() => setIsCartOpen(false)}
+                      />
+                      {/* Mobil qurilmalarda ekranni to'ldirib, planshet/kompyuterda o'ng tomonga joylashadigan responsive dizayn */}
+                      <div className="absolute right-[-30px] sm:right-0 top-full mt-3 w-[calc(100vw-32px)] sm:w-[380px] max-w-[380px] bg-white rounded-[24px] shadow-2xl border border-gray-100 z-50 overflow-hidden select-none animate-in fade-in zoom-in-95 duration-200">
+                        <div className="max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 flex flex-col divide-y divide-gray-100">
+                          {cartItems.length === 0 ? (
+                            <p className="py-8 text-center text-sm text-gray-500 font-['Bahnschrift']">
+                              ВАША КОРЗИНА ПУСТА
+                            </p>
+                          ) : (
+                            cartItems.map((item) => (
+                              <div
+                                key={item.id}
+                                className="py-3.5 first:pt-1 last:pb-1 flex items-start gap-3"
+                              >
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-12 h-14 object-contain shrink-0"
+                                />
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-1">
+                                    <h4 className="font-['Bahnschrift'] font-bold text-sm uppercase text-[#1E1E1E] truncate">
+                                      {item.name}
+                                    </h4>
+                                    <button
+                                      onClick={() => removeItem(item.id)}
+                                      className="text-gray-400 hover:text-red-500 transition-colors p-0.5 cursor-pointer"
+                                      title="Удалить"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+
+                                  <p className="text-[11px] text-gray-500 mt-0.5">
+                                    {item.volume}
+                                  </p>
+                                  {item.description && (
+                                    <p className="text-[10px] text-gray-400 leading-tight line-clamp-1 mt-0.5">
+                                      {item.description}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between mt-2.5">
+                                    <div className="flex items-center bg-gray-100 rounded-full px-2 py-0.5 gap-2.5">
+                                      <button
+                                        onClick={() => updateQuantity(item.id, -1)}
+                                        className="text-gray-600 hover:text-black font-bold text-xs cursor-pointer"
+                                      >
+                                        <Minus className="w-3 h-3 stroke-[2.5]" />
+                                      </button>
+                                      <span className="font-['Bahnschrift'] font-bold text-xs text-[#1E1E1E]">
+                                        {item.quantity}
+                                      </span>
+                                      <button
+                                        onClick={() => updateQuantity(item.id, 1)}
+                                        className="text-gray-600 hover:text-black font-bold text-xs cursor-pointer"
+                                      >
+                                        <Plus className="w-3 h-3 stroke-[2.5]" />
+                                      </button>
+                                    </div>
+
+                                    <span className="font-['Bahnschrift'] font-bold text-sm text-[#1E1E1E]">
+                                      {item.price * item.quantity}₽
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+
+                          <div className="py-3 flex items-center justify-between text-xs font-['Bahnschrift'] font-medium text-[#1E1E1E]">
+                            <div className="flex items-center gap-2">
+                              <span>БУТЫЛОЧКА</span>
+                              <Trash2 className="w-3 h-3 text-gray-400 cursor-pointer hover:text-red-500" />
+                            </div>
+                            <span>0₽</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-[#FFD600] px-5 py-3.5 flex items-center justify-between">
+                          <span className="font-['Bahnschrift'] font-bold text-sm sm:text-base uppercase tracking-wide text-[#1E1E1E]">
+                            СУММА ЗАКАЗА
+                          </span>
+                          <span className="font-['Bahnschrift'] font-bold text-base sm:text-lg text-[#1E1E1E]">
+                            {totalPrice}₽
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
 
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
@@ -186,73 +309,113 @@ export default function Header() {
             <div className="hidden lg:flex items-center justify-between gap-y-3 pt-1">
               <nav className="flex items-center gap-5 md:gap-7 overflow-x-auto no-scrollbar pb-1">
                 {categories.map((item) => (
-                  <Link
+                  <NavLink
                     key={item.name}
                     to={item.path}
-                    className="group shrink-0 flex flex-col items-center gap-1.5 text-xs md:text-[13px] font-bold tracking-wide hover:text-orange-600 transition-colors"
+                    className={({ isActive }) =>
+                      `group shrink-0 flex flex-col items-center gap-1.5 text-xs md:text-[13px] font-bold tracking-wide transition-colors ${
+                        isActive
+                          ? "text-[#FFD600]"
+                          : "text-[#1E1E1E] hover:text-orange-600"
+                      }`
+                    }
                   >
-                    <span className="whitespace-nowrap">{item.name}</span>
-                    <span className="w-3.5 h-3.5 rounded-full bg-[#D9D9D9] group-hover:bg-orange-500 transition-colors" />
-                  </Link>
+                    {({ isActive }) => (
+                      <>
+                        <span className="whitespace-nowrap">{item.name}</span>
+                        <span
+                          className={`w-3.5 h-3.5 rounded-full transition-colors ${
+                            isActive
+                              ? "bg-[#FFD600]"
+                              : "bg-[#D9D9D9] group-hover:bg-orange-500"
+                          }`}
+                        />
+                      </>
+                    )}
+                  </NavLink>
                 ))}
               </nav>
 
               <nav className="flex items-center gap-6 text-xs md:text-[13px] font-bold tracking-wide pb-5 shrink-0">
                 {infoLinks.map((link) => (
-                  <Link
+                  <NavLink
                     key={link.name}
                     to={link.path}
-                    className="hover:text-orange-600 transition-colors"
+                    className={({ isActive }) =>
+                      `transition-colors ${
+                        isActive
+                          ? "text-orange-600"
+                          : "text-[#1E1E1E] hover:text-orange-600"
+                      }`
+                    }
                   >
                     {link.name}
-                  </Link>
+                  </NavLink>
                 ))}
               </nav>
             </div>
-
           </div>
         </div>
 
         <div
           className={`lg:hidden overflow-hidden bg-white transition-all duration-300 ease-in-out ${
-            activeMobileMenu === 'burger'
-              ? 'max-h-72 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100'
-              : 'max-h-0 py-0 px-4 opacity-0'
+            activeMobileMenu === "burger"
+              ? "max-h-72 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100"
+              : "max-h-0 py-0 px-4 opacity-0"
           }`}
         >
           <div className="flex flex-col gap-2.5">
             {infoLinks.map((link) => (
-              <Link
+              <NavLink
                 key={link.name}
                 to={link.path}
                 onClick={() => setActiveMobileMenu(null)}
-                className="py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-orange-50 hover:text-orange-600 font-bold text-sm transition-colors"
+                className={({ isActive }) =>
+                  `py-2.5 px-4 rounded-xl font-bold text-sm transition-colors ${
+                    isActive
+                      ? "bg-orange-50 text-orange-600"
+                      : "bg-gray-50 hover:bg-orange-50 hover:text-orange-600"
+                  }`
+                }
               >
                 {link.name}
-              </Link>
+              </NavLink>
             ))}
           </div>
         </div>
 
-        {/* Mobil Katalog Menyu */}
         <div
           className={`lg:hidden overflow-hidden bg-white transition-all duration-300 ease-in-out ${
-            activeMobileMenu === 'catalog'
-              ? 'max-h-96 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100'
-              : 'max-h-0 py-0 px-4 opacity-0'
+            activeMobileMenu === "catalog"
+              ? "max-h-96 border-t border-gray-100 py-5 px-4 shadow-xl opacity-100"
+              : "max-h-0 py-0 px-4 opacity-0"
           }`}
         >
           <div className="grid grid-cols-2 gap-2.5">
             {categories.map((item) => (
-              <Link
+              <NavLink
                 key={item.name}
                 to={item.path}
                 onClick={() => setActiveMobileMenu(null)}
-                className="py-2.5 px-3.5 rounded-xl bg-gray-50 hover:bg-orange-50 hover:text-orange-600 font-bold text-xs transition-colors flex items-center justify-between"
+                className={({ isActive }) =>
+                  `py-2.5 px-3.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-between ${
+                    isActive
+                      ? "bg-[#FFD600]/20 text-[#1E1E1E]"
+                      : "bg-gray-50 hover:bg-orange-50 hover:text-orange-600"
+                  }`
+                }
               >
-                <span>{item.name}</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-[#D9D9D9]" />
-              </Link>
+                {({ isActive }) => (
+                  <>
+                    <span>{item.name}</span>
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        isActive ? "bg-[#FFD600]" : "bg-[#D9D9D9]"
+                      }`}
+                    />
+                  </>
+                )}
+              </NavLink>
             ))}
           </div>
         </div>
@@ -260,23 +423,24 @@ export default function Header() {
         <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
       </header>
 
+      {/* RESPONSIVE REGION MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isRegionModalOpen
-            ? 'opacity-100 pointer-events-auto visible'
-            : 'opacity-0 pointer-events-none invisible'
+            ? "opacity-100 pointer-events-auto visible"
+            : "opacity-0 pointer-events-none invisible"
         }`}
         onClick={() => setIsRegionModalOpen(false)}
       >
         <div
-          className={`w-full max-w-[600px] bg-white rounded-[28px] overflow-hidden shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
+          className={`w-full max-w-[600px] max-h-[90vh] overflow-y-auto bg-white rounded-[28px] shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
             isRegionModalOpen
-              ? 'scale-100 translate-y-0 opacity-100'
-              : 'scale-95 translate-y-4 opacity-0'
+              ? "scale-100 translate-y-0 opacity-100"
+              : "scale-95 translate-y-4 opacity-0"
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="bg-[#FFD600] px-6 sm:px-8 py-4 sm:py-5 flex items-center justify-between">
+          <div className="bg-[#FFD600] px-6 sm:px-8 py-4 sm:py-5 flex items-center justify-between sticky top-0 z-10">
             <h3 className="font-['Bahnschrift'] font-normal text-xl sm:text-2xl uppercase tracking-wide">
               ВАШ РЕГИОН
             </h3>
@@ -295,7 +459,7 @@ export default function Header() {
             </p>
 
             <button
-              onClick={() => handleSelectRegion('Красноярск')}
+              onClick={() => handleSelectRegion("Красноярск")}
               className="bg-[#FFD600] hover:bg-[#f5cc00] text-[#1E1E1E] font-['Bahnschrift'] font-bold text-sm sm:text-base px-8 py-1.5 rounded-full uppercase tracking-wider transition-colors cursor-pointer mb-6"
             >
               ДА
@@ -312,8 +476,8 @@ export default function Header() {
                   onClick={() => handleSelectRegion(city)}
                   className={`text-left hover:text-[#779A4B] transition-colors cursor-pointer ${
                     selectedRegion === city.toUpperCase()
-                      ? 'font-bold text-[#779A4B]'
-                      : 'text-[#1E1E1E]'
+                      ? "font-bold text-[#779A4B]"
+                      : "text-[#1E1E1E]"
                   }`}
                 >
                   {city}
@@ -324,23 +488,24 @@ export default function Header() {
         </div>
       </div>
 
+      {/* RESPONSIVE LOGIN MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isLoginModalOpen
-            ? 'opacity-100 pointer-events-auto visible'
-            : 'opacity-0 pointer-events-none invisible'
+            ? "opacity-100 pointer-events-auto visible"
+            : "opacity-0 pointer-events-none invisible"
         }`}
         onClick={() => setIsLoginModalOpen(false)}
       >
         <div
-          className={`w-full max-w-[540px] bg-white rounded-[28px] overflow-hidden shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
+          className={`w-full max-w-[540px] max-h-[90vh] overflow-y-auto bg-white rounded-[28px] shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
             isLoginModalOpen
-              ? 'scale-100 translate-y-0 opacity-100'
-              : 'scale-95 translate-y-4 opacity-0'
+              ? "scale-100 translate-y-0 opacity-100"
+              : "scale-95 translate-y-4 opacity-0"
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="bg-[#FFD600] px-6 sm:px-9 py-4 sm:py-5 flex items-center justify-between">
+          <div className="bg-[#FFD600] px-6 sm:px-9 py-4 sm:py-5 flex items-center justify-between sticky top-0 z-10">
             <h3 className="font-['Bahnschrift'] font-normal text-xl sm:text-2xl uppercase tracking-wide">
               ВХОД НА САЙТ
             </h3>
@@ -353,8 +518,10 @@ export default function Header() {
             </button>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="px-6 sm:px-9 py-7 sm:py-8 flex flex-col gap-5 sm:gap-6">
-            
+          <form
+            onSubmit={handleLoginSubmit}
+            className="px-6 sm:px-9 py-7 sm:py-8 flex flex-col gap-5 sm:gap-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
               <label className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
                 Имя
@@ -388,7 +555,8 @@ export default function Header() {
 
               <div className="w-full flex flex-col items-start gap-4">
                 <p className="text-[10px] sm:text-[11px] text-[#1E1E1E]/85 leading-snug">
-                  Продолжая Вы соглашаетесь с пользовательским соглашением и политикой обработки персональных данных
+                  Продолжая Вы соглашаетесь с пользовательским соглашением и
+                  политикой обработки персональных данных
                 </p>
 
                 <button
@@ -405,7 +573,6 @@ export default function Header() {
                 </button>
               </div>
             </div>
-
           </form>
         </div>
       </div>

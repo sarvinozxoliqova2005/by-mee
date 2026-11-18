@@ -1,20 +1,18 @@
-import React from 'react'
-import Header from './Header'
-import { Outlet } from 'react-router-dom'
-import Footer from './Footer'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Header from './Header';
+import Footer from './Footer';
 
-const Layout = () => {
+export default function Layout({ cartItems, setCartItems, onAddToCart }) {
   return (
-    <div>
-        <Header/>
+    <div className="min-h-screen flex flex-col">
+      <Header cartItems={cartItems} setCartItems={setCartItems} />
+      
+      <main className="flex-1">
+        <Outlet context={{ onAddToCart, cartItems, setCartItems }} />
+      </main>
 
-        <main>
-            <Outlet/>
-        </main>
-
-        <Footer/>
+      <Footer />
     </div>
-  )
+  );
 }
-
-export default Layout

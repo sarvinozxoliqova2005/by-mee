@@ -35,7 +35,7 @@ const slides = [
   },
 ];
 
-export default function HeroSlider() {
+export default function HeroSlider({ cartItems, setCartItems, onAddToCart }) {
   const [current, setCurrent] = useState(0);
 
   const prevSlide = () => {
@@ -145,9 +145,10 @@ export default function HeroSlider() {
         <ProductPage />
       </section>
 
-      <section>
-        <Bestsellers />
-      </section>
+      <div>
+      {/* Bestsellers componentiga cartItems va setCartItems berildi */}
+      <Bestsellers cartItems={cartItems} setCartItems={setCartItems} />
+    </div>
 
       <section>
         <DeliveryAndPayment />
