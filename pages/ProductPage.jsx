@@ -173,7 +173,7 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
 
   return (
     <main className="w-full bg-white text-[#1E1E1E] select-none pb-20">
-      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 md:px-8 pt-6">
+      <div className="max-w-[1440px] mx-auto container px-4 sm:px-6 md:px-8 pt-6">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-black mb-6 cursor-pointer transition-colors"
@@ -237,60 +237,60 @@ export default function ProductPage({ onAddToCart: propAddToCart }) {
               <p className="text-gray-500 mt-0.5">{product.storage}</p>
             </div>
 
-            <div className="pt-4 border-t border-gray-100 flex flex-col items-center gap-4">
-              <div className="flex items-center justify-center gap-4 w-full">
-                <span className="font-['Bahnschrift'] font-bold text-2xl sm:text-3xl text-[#1E1E1E]">
-                  {displayPrice}₽
-                </span>
+           <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
+  <div className="flex items-center justify-center sm:justify-start gap-4 w-full sm:w-auto">
+    <span className="font-['Bahnschrift'] font-bold text-2xl sm:text-3xl text-[#1E1E1E]">
+      {displayPrice}₽
+    </span>
 
-                <button
-                  type="button"
-                  onClick={() => setIsLiked(!isLiked)}
-                  aria-label="В избранное"
-                  className="p-2 sm:p-2.5 rounded-full border border-gray-200 hover:border-red-500 hover:text-red-500 transition-colors cursor-pointer"
-                >
-                  <Heart
-                    className={`w-5 h-5 sm:w-5 sm:h-5 ${
-                      isLiked ? "fill-red-500 text-red-500" : "stroke-[1.8]"
-                    }`}
-                  />
-                </button>
-              </div>
+    <button
+      type="button"
+      onClick={() => setIsLiked(!isLiked)}
+      aria-label="В избранное"
+      className="p-2 sm:p-2.5 rounded-full border border-gray-200 hover:border-red-500 hover:text-red-500 transition-colors cursor-pointer"
+    >
+      <Heart
+        className={`w-5 h-5 sm:w-5 sm:h-5 ${
+          isLiked ? "fill-red-500 text-red-500" : "stroke-[1.8]"
+        }`}
+      />
+    </button>
+  </div>
 
-              {quantity > 0 ? (
-                <div className="flex items-center justify-center bg-gray-100 rounded-full px-5 py-2.5 gap-6 w-full max-w-[220px]">
-                  <button
-                    type="button"
-                    onClick={() => updateQuantity(product.id, -1)}
-                    className="text-gray-600 hover:text-black font-bold text-sm cursor-pointer"
-                  >
-                    <Minus className="w-4 h-4 stroke-[2.5]" />
-                  </button>
-                  <span className="font-['Bahnschrift'] font-bold text-sm text-[#1E1E1E]">
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => updateQuantity(product.id, 1)}
-                    className="text-gray-600 hover:text-black font-bold text-sm cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4 stroke-[2.5]" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onAddToCart) {
-                      onAddToCart(product);
-                    }
-                  }}
-                  className="bg-[#FFD600] hover:bg-[#f5cc00] active:scale-95 text-[#1E1E1E] font-['Bahnschrift'] font-bold text-xs sm:text-sm w-full max-w-[220px] py-2.5 rounded-full uppercase tracking-wider shadow-sm transition-all cursor-pointer text-center"
-                >
-                  В КОРЗИНУ
-                </button>
-              )}
-            </div>
+  {quantity > 0 ? (
+    <div className="flex items-center justify-between bg-gray-100 rounded-full px-5 py-2.5 gap-6 w-full max-w-[220px] sm:w-[220px]">
+      <button
+        type="button"
+        onClick={() => updateQuantity(product.id, -1)}
+        className="text-gray-600 hover:text-black font-bold text-sm cursor-pointer"
+      >
+        <Minus className="w-4 h-4 stroke-[2.5]" />
+      </button>
+      <span className="font-['Bahnschrift'] font-bold text-sm text-[#1E1E1E]">
+        {quantity}
+      </span>
+      <button
+        type="button"
+        onClick={() => updateQuantity(product.id, 1)}
+        className="text-gray-600 hover:text-black font-bold text-sm cursor-pointer"
+      >
+        <Plus className="w-4 h-4 stroke-[2.5]" />
+      </button>
+    </div>
+  ) : (
+    <button
+      type="button"
+      onClick={() => {
+        if (onAddToCart) {
+          onAddToCart(product);
+        }
+      }}
+      className="bg-[#FFD600] hover:bg-[#f5cc00] active:scale-95 text-[#1E1E1E] font-['Bahnschrift'] font-bold text-xs sm:text-sm w-full max-w-[220px] sm:w-[220px] py-2.5 rounded-full uppercase tracking-wider shadow-sm transition-all cursor-pointer text-center"
+    >
+      В КОРЗИНУ
+    </button>
+  )}
+</div>
           </div>
         </div>
       </div>
