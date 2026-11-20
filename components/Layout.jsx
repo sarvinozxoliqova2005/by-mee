@@ -8,7 +8,7 @@ export default function Layout({ cartItems, setCartItems, onAddToCart }) {
     <div className="flex flex-col min-h-screen bg-white">
       <Header cartItems={cartItems} setCartItems={setCartItems} />
 
-      <main className="flex-1">
+      <main className="flex-1 ">
         <Outlet context={{ cartItems, setCartItems, onAddToCart }} />
       </main>
 

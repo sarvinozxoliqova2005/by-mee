@@ -40,17 +40,50 @@ export default function Header({ cartItems = [] }) {
 
   const [selectedRegion, setSelectedRegion] = useState("ВАШ РЕГИОН");
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [activeMobileMenu, setActiveMobileMenu] = useState(null);
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  const [userName, setUserName] = useState("");
-  const [userPhone, setUserPhone] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    try {
+      const isAuth = localStorage.getItem("vita_juice_is_logged_in") === "true";
+      const saved = JSON.parse(
+        localStorage.getItem("vita_juice_personal_area") || "{}"
+      );
+      return isAuth && saved.name ? saved.name : "";
+    } catch {
+      return "";
+    }
+  });
 
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQuantity = cartItems.reduce(
+    (sum, item) => sum + Number(item.quantity || 1),
+    0
+  );
+
+  useEffect(() => {
+    const syncAuth = () => {
+      try {
+        const isAuth =
+          localStorage.getItem("vita_juice_is_logged_in") === "true";
+        const saved = JSON.parse(
+          localStorage.getItem("vita_juice_personal_area") || "{}"
+        );
+        setLoggedInUser(isAuth && saved.name ? saved.name : "");
+      } catch {
+        setLoggedInUser("");
+      }
+    };
+
+    window.addEventListener("storage", syncAuth);
+    window.addEventListener("focus", syncAuth);
+    return () => {
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("focus", syncAuth);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,7 +91,7 @@ export default function Header({ cartItems = [] }) {
 
       setIsScrolled(currentScrollY > 20);
 
-      if (isRegionModalOpen || isLoginModalOpen) {
+      if (isRegionModalOpen) {
         setIsHeaderVisible(true);
         setLastScrollY(currentScrollY);
         return;
@@ -78,7 +111,7 @@ export default function Header({ cartItems = [] }) {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen]);
+  }, [lastScrollY, isRegionModalOpen]);
 
   const handleSelectRegion = (region) => {
     setSelectedRegion(region.toUpperCase());
@@ -87,14 +120,6 @@ export default function Header({ cartItems = [] }) {
 
   const toggleMobileMenu = (menuType) => {
     setActiveMobileMenu((prev) => (prev === menuType ? null : menuType));
-  };
-
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    if (!userName.trim() || !userPhone.trim()) return;
-    setIsLoginModalOpen(false);
-    setUserName("");
-    setUserPhone("");
   };
 
   return (
@@ -167,10 +192,9 @@ export default function Header({ cartItems = [] }) {
                 </button>
               </div>
 
-              <Link to='/cart' className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => navigate("/cart")}
+              <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
+                <Link
+                  to="/cart"
                   className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer relative"
                 >
                   <span className="hidden sm:inline">
@@ -184,17 +208,19 @@ export default function Header({ cartItems = [] }) {
                       </span>
                     )}
                   </div>
-                </button>
+                </Link>
 
-                <button
+                <Link to ='/personal'
                   type="button"
-                  onClick={() => setIsLoginModalOpen(true)}
+                  onClick={() => navigate("/personal-area")}
                   className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer uppercase"
                 >
-                  <span className="hidden sm:inline">ВОЙТИ</span>
-                  <Sun className="w-5 h-5 stroke-[1.8]" />
-                </button>
-              </Link>
+                  <span className="hidden sm:inline">
+                    {loggedInUser ? loggedInUser : "ВОЙТИ"}
+                  </span>
+                  <Sun className="w-5 h-5 stroke-[1.8] text-[#FFD600]" />
+                </Link>
+              </div>
             </div>
 
             <div className="hidden lg:flex items-center justify-between gap-y-3 pt-1">
@@ -378,95 +404,6 @@ export default function Header({ cartItems = [] }) {
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div
-        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
-          isLoginModalOpen
-            ? "opacity-100 pointer-events-auto visible"
-            : "opacity-0 pointer-events-none invisible"
-        }`}
-        onClick={() => setIsLoginModalOpen(false)}
-      >
-        <div
-          className={`w-full max-w-[540px] max-h-[90vh] overflow-y-auto bg-white rounded-[28px] shadow-2xl text-[#1E1E1E] transition-all duration-300 ease-out ${
-            isLoginModalOpen
-              ? "scale-100 translate-y-0 opacity-100"
-              : "scale-95 translate-y-4 opacity-0"
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="bg-[#FFD600] px-6 sm:px-9 py-4 sm:py-5 flex items-center justify-between sticky top-0 z-10">
-            <h3 className="font-['Bahnschrift'] font-normal text-xl sm:text-2xl uppercase tracking-wide">
-              ВХОД НА САЙТ
-            </h3>
-            <button
-              type="button"
-              onClick={() => setIsLoginModalOpen(false)}
-              aria-label="Закрыть"
-              className="p-1 hover:rotate-90 hover:scale-110 transition-all duration-300 cursor-pointer"
-            >
-              <X className="w-6 h-6 stroke-[2]" />
-            </button>
-          </div>
-
-          <form
-            onSubmit={handleLoginSubmit}
-            className="px-6 sm:px-9 py-7 sm:py-8 flex flex-col gap-5 sm:gap-6"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
-              <label className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
-                Имя
-              </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                required
-                className="w-full bg-transparent border-b-[4px] border-dashed border-[#1E1E1E] focus:outline-none focus:border-[#779A4B] py-1 text-base sm:text-lg font-medium transition-colors"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
-              <label className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
-                Телефон
-              </label>
-              <input
-                type="tel"
-                value={userPhone}
-                onChange={(e) => setUserPhone(e.target.value)}
-                required
-                className="w-full bg-transparent border-b-[4px] border-dashed border-[#1E1E1E] focus:outline-none focus:border-[#779A4B] py-1 text-base sm:text-lg font-medium transition-colors"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-6 mt-1">
-              <span className="font-['Bahnschrift'] text-lg sm:text-xl text-[#1E1E1E] shrink-0 sm:w-[130px]">
-                Выслать код
-              </span>
-
-              <div className="w-full flex flex-col items-start gap-4">
-                <p className="text-[10px] sm:text-[11px] text-[#1E1E1E]/85 leading-snug">
-                  Продолжая Вы соглашаетесь с пользовательским соглашением и
-                  политикой обработки персональных данных
-                </p>
-
-                <button
-                  type="submit"
-                  aria-label="Отправить код"
-                  className="bg-[#FFD600] hover:bg-[#f5cc00] text-[#1E1E1E] w-24 h-8 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-all cursor-pointer"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="w-3.5 h-3.5 fill-current ml-0.5"
-                  >
-                    <path d="M5 3l14 9-14 9V3z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </form>
         </div>
       </div>
     </>

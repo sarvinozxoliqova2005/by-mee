@@ -5,6 +5,11 @@ import HomaPages from '../pages/HomaPages';
 import CategoryPage from '../pages/CategoryPage';
 import ProductPage from '../pages/ProductPage'; 
 import CartPage from '../pages/CartPage';
+import RegistrationPage from '../pages/RegistrationPage';
+import PaymentInputPage from '../pages/PaymentInputPage';
+import SuccessfulPage from '../pages/SuccessfulPage';
+import PersonalAreaPage from '../pages/PersonalAreaPage';
+import HistoryPage from '../pages/HistoryPage';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -58,11 +63,14 @@ const App = () => {
                 setCartItems={setCartItems} 
                 onAddToCart={handleAddToCart} 
               />
-            } 
-
-          
+            }
           />
           <Route path='/cart' element={<CartPage/>}/>
+          <Route path ='/registration' element = {<RegistrationPage/>}/>
+          <Route path ='/input' element = {<PaymentInputPage/>}/>
+          <Route path='/success' element= {<SuccessfulPage/>}/>
+          <Route path='/personal' element= {<PersonalAreaPage/>}/>
+          <Route path ='/history' element ={<HistoryPage/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

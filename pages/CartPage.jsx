@@ -119,7 +119,6 @@ export default function CartPage() {
 
   return (
     <div className="w-full bg-white text-[#1E1E1E]">
-      {/* Bosqichlar paneli */}
       <div className="w-full bg-[#6FA352] text-white">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-center sm:justify-between gap-4 sm:gap-6 font-['Bahnschrift'] uppercase tracking-wider">
           <button
@@ -132,7 +131,7 @@ export default function CartPage() {
             КОРЗИНА
           </button>
 
-          <button
+          <Link to='/registration'
             type="button"
             onClick={() => setActiveStep("checkout")}
             className={`hidden sm:inline-block text-2xl sm:text-3xl md:text-4xl font-bold transition-opacity cursor-pointer ${
@@ -142,7 +141,7 @@ export default function CartPage() {
             }`}
           >
             ОФОРМЛЕНИЕ
-          </button>
+          </Link>
 
           <button
             type="button"
@@ -158,7 +157,6 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* Asosiy kontent */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-10">
         {items.length === 0 ? (
           <div className="py-16 text-center space-y-5">
@@ -174,7 +172,6 @@ export default function CartPage() {
           </div>
         ) : (
           <>
-            {/* Mahsulotlar ro'yxati */}
             <div className="divide-y divide-dashed divide-[#1E1E1E] border-b border-dashed border-[#1E1E1E]">
               {items.map((item) => (
                 <div
@@ -206,7 +203,6 @@ export default function CartPage() {
                         </p>
                       )}
 
-                      {/* Miqdor boshqaruvi */}
                       <div className="pt-2">
                         <div className="inline-flex items-center justify-between bg-[#FFD600] rounded-full px-3 sm:px-3.5 py-1 gap-3 sm:gap-4 min-w-[88px] sm:min-w-[96px]">
                           <button
@@ -233,7 +229,6 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* O'ng ustun: o'chirish va narx */}
                   <div className="flex flex-col items-end justify-between self-stretch min-h-[96px] sm:min-h-[136px] shrink-0">
                     <button
                       type="button"
@@ -252,7 +247,6 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* Promokod va ma'lumot bloki */}
             <form
               onSubmit={handleApplyPromo}
               className="py-6 sm:py-7 border-b border-dashed border-[#1E1E1E] flex flex-col items-center justify-center gap-3"
@@ -300,7 +294,6 @@ export default function CartPage() {
               )}
             </form>
 
-            {/* Ishlaydigan Butylochka qatori */}
             <div className="py-5 sm:py-6 border-b border-dashed border-[#1E1E1E] flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 sm:gap-10 flex-wrap">
                 <button
@@ -350,7 +343,6 @@ export default function CartPage() {
               </span>
             </div>
 
-            {/* Buyurtma summasi va tugma */}
             <div className="pt-6 pb-2 space-y-7 sm:space-y-8">
               <div className="flex items-center justify-between gap-3">
                 <span className="font-['Bahnschrift'] font-bold text-base sm:text-xl uppercase tracking-wide">
@@ -361,7 +353,7 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <div className="flex justify-center">
+              <Link to='/registration' className="flex justify-center">
                 <button
                   type="button"
                   onClick={() => setActiveStep("checkout")}
@@ -369,13 +361,12 @@ export default function CartPage() {
                 >
                   ОФОРМИТЬ
                 </button>
-              </div>
+              </Link>
             </div>
           </>
         )}
       </div>
 
-      {/* Huquqiy ma'lumotlar */}
       <div className="border-t border-dashed border-[#1E1E1E]">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-7 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-[#1E1E1E]">
           <div className="space-y-1">
@@ -407,7 +398,6 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* Yashil footer banneri */}
       <div className="w-full bg-[#6FA352] text-white border-t border-dashed border-[#1E1E1E]">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-['Bahnschrift'] font-bold text-xl sm:text-3xl uppercase tracking-wide text-center sm:text-left">
