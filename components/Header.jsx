@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { MapPin, ChevronDown, ShoppingCart, Sun, Menu, X, Trash2, Plus, Minus } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { MapPin, ChevronDown, ShoppingCart, Sun, Menu, X } from "lucide-react";
 
 const categories = [
   { name: "СОКИ", path: "/soki" },
@@ -35,11 +35,12 @@ const regions = [
   "Уфа",
 ];
 
-export default function Header({ cartItems = [], setCartItems }) {
+export default function Header({ cartItems = [] }) {
+  const navigate = useNavigate();
+
   const [selectedRegion, setSelectedRegion] = useState("ВАШ РЕГИОН");
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeMobileMenu, setActiveMobileMenu] = useState(null);
 
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -49,32 +50,7 @@ export default function Header({ cartItems = [], setCartItems }) {
   const [userName, setUserName] = useState("");
   const [userPhone, setUserPhone] = useState("");
 
-  const updateQuantity = (id, delta) => {
-    if (!setCartItems) return;
-    setCartItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean)
-    );
-  };
-
-  const removeItem = (id) => {
-    if (!setCartItems) return;
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,7 +58,7 @@ export default function Header({ cartItems = [], setCartItems }) {
 
       setIsScrolled(currentScrollY > 20);
 
-      if (isRegionModalOpen || isLoginModalOpen || isCartOpen) {
+      if (isRegionModalOpen || isLoginModalOpen) {
         setIsHeaderVisible(true);
         setLastScrollY(currentScrollY);
         return;
@@ -102,7 +78,7 @@ export default function Header({ cartItems = [], setCartItems }) {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen, isCartOpen]);
+  }, [lastScrollY, isRegionModalOpen, isLoginModalOpen]);
 
   const handleSelectRegion = (region) => {
     setSelectedRegion(region.toUpperCase());
@@ -145,6 +121,7 @@ export default function Header({ cartItems = [], setCartItems }) {
 
             <div className="lg:hidden flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => toggleMobileMenu("burger")}
                 className="p-1 cursor-pointer hover:opacity-75 transition-opacity"
                 aria-label="Навигация"
@@ -157,6 +134,7 @@ export default function Header({ cartItems = [], setCartItems }) {
               </button>
 
               <button
+                type="button"
                 onClick={() => toggleMobileMenu("catalog")}
                 className={`font-['Bahnschrift'] font-bold text-xl tracking-wide cursor-pointer py-1 transition-colors ${
                   activeMobileMenu === "catalog"
@@ -173,6 +151,7 @@ export default function Header({ cartItems = [], setCartItems }) {
             <div className="flex items-center justify-between text-xs md:text-sm font-semibold tracking-wide relative gap-2">
               <div className="relative min-w-0">
                 <button
+                  type="button"
                   onClick={() => setIsRegionModalOpen(true)}
                   className="flex items-center gap-1 sm:gap-1.5 hover:opacity-75 transition-opacity cursor-pointer py-1"
                 >
@@ -181,138 +160,41 @@ export default function Header({ cartItems = [], setCartItems }) {
                     {selectedRegion}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 stroke-[1.8] shrink-0 transition-transform duration-300 ${isRegionModalOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 stroke-[1.8] shrink-0 transition-transform duration-300 ${
+                      isRegionModalOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
-                <div className="relative">
-                  <button
-                    onClick={() => setIsCartOpen(!isCartOpen)}
-                    className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer relative"
-                  >
-                    {/* Noutbukda yozuv va son chiqadi, mobil versiyada yozuvi yashirinadi */}
-                    <span className="hidden sm:inline">
-                      КОРЗИНА ({totalQuantity})
-                    </span>
-                    <div className="relative">
-                      <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
-                      {/* Mobil versiyada ikonka ustida badge (soni) ko'rinib turadi */}
-                      {totalQuantity > 0 && (
-                        <span className="absolute -top-1.5 -right-2 bg-orange-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center sm:hidden">
-                          {totalQuantity}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-
-                  {isCartOpen && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40 bg-black/30"
-                        style={{ backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
-                        onClick={() => setIsCartOpen(false)}
-                      />
-                      <div className="absolute right-[-30px] sm:right-0 top-full mt-3 w-[calc(100vw-32px)] sm:w-[380px] max-w-[380px] bg-white rounded-[24px] shadow-2xl border border-gray-100 z-50 overflow-hidden select-none animate-in fade-in zoom-in-95 duration-200">
-                        <div className="max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 flex flex-col divide-y divide-gray-100">
-                          {cartItems.length === 0 ? (
-                            <p className="py-8 text-center text-sm text-gray-500 font-['Bahnschrift']">
-                              ВАША КОРЗИНА ПУСТА
-                            </p>
-                          ) : (
-                            cartItems.map((item) => (
-                              <div
-                                key={item.id}
-                                className="py-3.5 first:pt-1 last:pb-1 flex items-start gap-3"
-                              >
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-12 h-14 object-contain shrink-0"
-                                />
-
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between gap-1">
-                                    <h4 className="font-['Bahnschrift'] font-bold text-sm uppercase text-[#1E1E1E] truncate">
-                                      {item.name}
-                                    </h4>
-                                    <button
-                                      onClick={() => removeItem(item.id)}
-                                      className="text-gray-400 hover:text-red-500 transition-colors p-0.5 cursor-pointer"
-                                      title="Удалить"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-
-                                  <p className="text-[11px] text-gray-500 mt-0.5">
-                                    {item.volume}
-                                  </p>
-                                  {item.description && (
-                                    <p className="text-[10px] text-gray-400 leading-tight line-clamp-1 mt-0.5">
-                                      {item.description}
-                                    </p>
-                                  )}
-
-                                  <div className="flex items-center justify-between mt-2.5">
-                                    <div className="flex items-center bg-gray-100 rounded-full px-2 py-0.5 gap-2.5">
-                                      <button
-                                        onClick={() => updateQuantity(item.id, -1)}
-                                        className="text-gray-600 hover:text-black font-bold text-xs cursor-pointer"
-                                      >
-                                        <Minus className="w-3 h-3 stroke-[2.5]" />
-                                      </button>
-                                      <span className="font-['Bahnschrift'] font-bold text-xs text-[#1E1E1E]">
-                                        {item.quantity}
-                                      </span>
-                                      <button
-                                        onClick={() => updateQuantity(item.id, 1)}
-                                        className="text-gray-600 hover:text-black font-bold text-xs cursor-pointer"
-                                      >
-                                        <Plus className="w-3 h-3 stroke-[2.5]" />
-                                      </button>
-                                    </div>
-
-                                    <span className="font-['Bahnschrift'] font-bold text-sm text-[#1E1E1E]">
-                                      {item.price * item.quantity}₽
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                          )}
-
-                          <div className="py-3 flex items-center justify-between text-xs font-['Bahnschrift'] font-medium text-[#1E1E1E]">
-                            <div className="flex items-center gap-2">
-                              <span>БУТЫЛОЧКА</span>
-                              <Trash2 className="w-3 h-3 text-gray-400 cursor-pointer hover:text-red-500" />
-                            </div>
-                            <span>0₽</span>
-                          </div>
-                        </div>
-
-                        <div className="bg-[#FFD600] px-5 py-3.5 flex items-center justify-between">
-                          <span className="font-['Bahnschrift'] font-bold text-sm sm:text-base uppercase tracking-wide text-[#1E1E1E]">
-                            СУММА ЗАКАЗА
-                          </span>
-                          <span className="font-['Bahnschrift'] font-bold text-base sm:text-lg text-[#1E1E1E]">
-                            {totalPrice}₽
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+              <Link to='/cart' className="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => navigate("/cart")}
+                  className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer relative"
+                >
+                  <span className="hidden sm:inline">
+                    КОРЗИНА ({totalQuantity})
+                  </span>
+                  <div className="relative">
+                    <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                    {totalQuantity > 0 && (
+                      <span className="absolute -top-1.5 -right-2 bg-orange-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center sm:hidden">
+                        {totalQuantity}
+                      </span>
+                    )}
+                  </div>
+                </button>
 
                 <button
+                  type="button"
                   onClick={() => setIsLoginModalOpen(true)}
                   className="flex items-center gap-1.5 sm:gap-2 hover:opacity-75 transition-opacity cursor-pointer uppercase"
                 >
                   <span className="hidden sm:inline">ВОЙТИ</span>
                   <Sun className="w-5 h-5 stroke-[1.8]" />
                 </button>
-              </div>
+              </Link>
             </div>
 
             <div className="hidden lg:flex items-center justify-between gap-y-3 pt-1">
@@ -432,7 +314,6 @@ export default function Header({ cartItems = [], setCartItems }) {
         <div className="w-full border-b-[4px] border-dashed border-[#1E1E1E]" />
       </header>
 
-      {/* REGION MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isRegionModalOpen
@@ -454,6 +335,7 @@ export default function Header({ cartItems = [], setCartItems }) {
               ВАШ РЕГИОН
             </h3>
             <button
+              type="button"
               onClick={() => setIsRegionModalOpen(false)}
               aria-label="Закрыть"
               className="p-1 hover:rotate-90 hover:scale-110 transition-all duration-300 cursor-pointer"
@@ -468,6 +350,7 @@ export default function Header({ cartItems = [], setCartItems }) {
             </p>
 
             <button
+              type="button"
               onClick={() => handleSelectRegion("Красноярск")}
               className="bg-[#FFD600] hover:bg-[#f5cc00] text-[#1E1E1E] font-['Bahnschrift'] font-bold text-sm sm:text-base px-8 py-1.5 rounded-full uppercase tracking-wider transition-colors cursor-pointer mb-6"
             >
@@ -481,6 +364,7 @@ export default function Header({ cartItems = [], setCartItems }) {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2.5 text-sm sm:text-base font-medium">
               {regions.map((city) => (
                 <button
+                  type="button"
                   key={city}
                   onClick={() => handleSelectRegion(city)}
                   className={`text-left hover:text-[#779A4B] transition-colors cursor-pointer ${
@@ -497,7 +381,6 @@ export default function Header({ cartItems = [], setCartItems }) {
         </div>
       </div>
 
-      {/* LOGIN MODAL */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-[1px] px-4 select-none transition-all duration-300 ease-out ${
           isLoginModalOpen
@@ -519,6 +402,7 @@ export default function Header({ cartItems = [], setCartItems }) {
               ВХОД НА САЙТ
             </h3>
             <button
+              type="button"
               onClick={() => setIsLoginModalOpen(false)}
               aria-label="Закрыть"
               className="p-1 hover:rotate-90 hover:scale-110 transition-all duration-300 cursor-pointer"

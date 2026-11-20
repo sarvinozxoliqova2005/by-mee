@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import HomaPages from '../pages/HomaPages';
 import CategoryPage from '../pages/CategoryPage';
 import ProductPage from '../pages/ProductPage'; 
+import CartPage from '../pages/CartPage';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -58,7 +59,10 @@ const App = () => {
                 onAddToCart={handleAddToCart} 
               />
             } 
+
+          
           />
+          <Route path='/cart' element={<CartPage/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
